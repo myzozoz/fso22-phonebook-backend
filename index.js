@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 let persons = [
     {
       name: "Arto Hellas",
@@ -29,11 +31,11 @@ let persons = [
       <p>${new Date()}</p>`)
   })
 
-  app.get('/persons', (req, res) => {
+  app.get('/api/persons', (req, res) => {
     res.json(persons)
   })
 
-  app.get('/persons/:id', (req, res) => {
+  app.get('/api/persons/:id', (req, res) => {
     const person = persons.find(p => p.id === Number(req.params.id))
     console.log(person)
 
@@ -44,8 +46,28 @@ let persons = [
     )
   })
 
- 
+  app.post('/api/persons', (req, res) => {
+    const person = {...req.body}
+    person.id = Math.floor(Math.random()*999999)
+    
+    if (!person.name || !person.number) {
+      res.json({error: 'Name or number missing'})
+      res.status(400)
+    } else if (persons.findIndex(p => p.name === person.name) > -1) {
+      res.json({error: 'Name already exists'})
+      res.status(400)
+    } else {
+      persons = persons.concat(person)
+      res.json(person)
+      res.status(201)
+    }
+  })
 
+  app.delete('/api/persons/:id', (req, res) => {
+    persons = persons.filter(p => p.id !== Number(req.params.id))
+    res.status(204).end()
+  })
+  
   const PORT = 3001
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
