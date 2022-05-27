@@ -2,7 +2,6 @@ require('dotenv').config()
 const { response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
-const { findByIdAndRemove } = require('./models/person')
 const Person = require('./models/person')
 
 const app = express()
@@ -18,11 +17,12 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'))
 
-  app.get('/info', (req, res) => {
+  app.get('/info', (req, res, next) => {
     Person.find({}).then(persons => {
       res.send(`<p>Phonebook has info for ${persons.length} people</p>
       <p>${new Date()}</p>`)
     })
+    .catch(error => next(error))
   })
 
   app.get('/api/persons', (req, res, next) => {
@@ -34,7 +34,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :r
 
   app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id).then(person => {
-      console.log('person', person)
       if (person){
         console.log(person)
         res.json(person)
