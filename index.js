@@ -1,7 +1,17 @@
 const express = require('express')
+const morgan = require('morgan')
+
 const app = express()
 
+morgan.token('req-body', (req,res) => {
+  if (req.method === 'POST')
+    return JSON.stringify(req.body)
+  
+  return null
+})
+
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'))
 
 let persons = [
     {
@@ -67,7 +77,7 @@ let persons = [
     persons = persons.filter(p => p.id !== Number(req.params.id))
     res.status(204).end()
   })
-  
+
   const PORT = 3001
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
