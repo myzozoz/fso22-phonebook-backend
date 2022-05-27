@@ -2,6 +2,7 @@ require('dotenv').config()
 const { response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
+const { findByIdAndRemove } = require('./models/person')
 const Person = require('./models/person')
 
 const app = express()
@@ -55,8 +56,10 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :r
   })
 
   app.delete('/api/persons/:id', (req, res) => {
-    persons = persons.filter(p => p.id !== Number(req.params.id))
-    res.status(204).end()
+    Person.findByIdAndRemove(req.params.id)
+      .then(result => {
+        res.status(204).end()
+      })
   })
 
   const PORT = process.env.PORT
