@@ -5,7 +5,7 @@ console.log(`Connecting to ${url}...`)
 
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log('Connection to MongoDB successful')
   })
   .catch((error) => {
@@ -24,7 +24,7 @@ const personSchema = new mongoose.Schema({
     validate: {
       validator: (val) => {
         const parts = val.split('-')
-        if (parts.length != 2 || parts[0].length < 2 || parts[0].length > 3) {
+        if (parts.length !== 2 || parts[0].length < 2 || parts[0].length > 3) {
           return false
         }
       },
